@@ -1,9 +1,10 @@
-{{!-- book-details.hbs --}}
+{{! book-details.hbs }}
 
 <h1>{{title}}</h1>
-<hr>
-<p>Written by: {{author}}</p>
+<hr />
+<p>Written by: <a href="/authors/{{author._id}}">{{ author.name }}</a></p>
 <p>Summary: {{description}}</p>
 <p>Rating: {{rating}}/10</p>
-<hr>
+<hr />
 <a href="/books">Back</a>
+<a href="/books/edit/{{_id}}">Edit</a>

@@ -5,61 +5,46 @@ const express = require("express");
 const router = express.Router();
 
 // ********* require Book model in order to use it *********
-const Book = require("../models/Book.model");
 const Author = require("../models/Author.model");
 
 // ****************************************************************************************
 // GET route to display all the books
 // ****************************************************************************************
 
-router.get("/books", (req, res) => {
-  Book.find()
-  .populate("author")
-    .then((allTheBooksFromDB) => {
+router.get("/authors", (req, res) => {
+  Author.find()
+    .then((allTheAuthorsFromDB) => {
       //console.log(allTheBooksFromDB);
-      res.render("books-list", { books: allTheBooksFromDB });
+      res.render("authors-list", { authors: allTheAuthorsFromDB });
     })
     .catch((err) =>
-      console.log(`Err while getting the books from the  DB: ${err}`)
+      console.log(`Err while getting the authors from the  DB: ${err}`)
     );
 });
 
 router
-  .route("/books/new")
-  .get((req, res) => {
-    Author.find().then((allTheAuthors) =>
-      res.render("book-create", allTheAuthors)
-    );
-  })
+  .route("/authors/new")
+  .get((req, res) => res.render("author-create"))
   .post((req, res) => {
-    const { title, description, author, rating } = req.body;
-    console.log({ title, description, author, rating });
-
-    Book.create({ title, description, author, rating })
-      .then((newBook) => res.redirect(`/books/${newBook._id}`))
+    const { name } = req.body;
+    Author.create({ name })
+      .then((newAuthor) => res.redirect(`/authors/${newAuthor._id}`))
       .catch((err) => console.log(err));
   });
 
-
-  router
-  .route("/books/edit/:id")
+router
+  .route("/authors/edit/:id")
   .get((req, res) => {
     const { id } = req.params;
-    console.log("EDIT book ", id);
-    Book.findById(id)
-      .then((book) => res.render("book-edit", book))
+    Author.findById(id)
+      .then((author) => res.render("author-edit", author))
       .catch((err) => console.log(err));
   })
   .post((req, res) => {
     const { id } = req.params;
-    const { title, description, author, rating } = req.body;
-    console.log("EDIT book ", id);
-    Book.findByIdAndUpdate(
-      id,
-      { title, description, author, rating },
-      { new: true }
-    )
-      .then((editedBook) => res.redirect(`/books/${editedBook._id}`))
+    const { name } = req.body;
+    Author.findByIdAndUpdate(id, { name }, { new: true })
+      .then((editedAuthor) => res.redirect(`/authors/${editedAuthor._id}`))
       .catch((err) => console.log(err));
   });
 
@@ -67,16 +52,16 @@ router
 // GET route for displaying the book details page
 // ****************************************************************************************
 
-router.get("/books/:id", (req, res) => {
+router.get("/authors/:id", (req, res) => {
   const { id } = req.params;
-  Book.findById(id)
-    .then((foundBook) => {
+  Author.findById(id)
+  .populate("books")
+    .then((foundAuthor) => {
       // console.log('Did I find a book?', foundBook);
-      res.render("book-details", foundBook);
+      res.render("author-details", foundAuthor);
     })
     .catch((err) =>
       console.log(`Err while getting the specific book from the  DB: ${err}`)
     );
 });
-
 module.exports = router;
